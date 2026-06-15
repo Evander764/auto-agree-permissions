@@ -1,17 +1,18 @@
 ---
 name: auto-agree-permissions
-description: Install and operate a local permission auto-approval helper for Claude Code and Codex. Use when a user wants Claude Code or Codex to stop asking for routine tool approvals, wants bypass-like behavior, or wants a portable setup that can be copied to another machine.
+description: Install and operate a local permission auto-approval helper for Claude Code, Codex, and terminal confirmation prompts. Use when a user wants Claude Code or Codex to stop asking for routine tool approvals, wants bypass-like behavior, wants terminal prompts auto-confirmed, or wants a portable setup that can be copied to another machine.
 ---
 
 # Auto Agree Permissions
 
 Use this skill when the user wants a local, user-level permission approval helper
-for Claude Code or Codex.
+for Claude Code, Codex, or terminal confirmation prompts.
 
-The skill ships a dependency-free bootstrap script:
+The skill ships dependency-free scripts:
 
 ```sh
 python3 scripts/auto_agree_bootstrap.py install --mode safe
+python3 scripts/terminal_auto_approve.py run --mode all -- your-command
 ```
 
 The script installs a Claude Code `PreToolUse` and `PermissionRequest` hook at:
@@ -77,6 +78,19 @@ Show status:
 python3 scripts/auto_agree_bootstrap.py status
 ```
 
+Run a command and auto-answer known terminal confirmation prompts:
+
+```sh
+python3 scripts/terminal_auto_approve.py run --mode all -- your-command arg1 arg2
+```
+
+Watch an already-open macOS Terminal/iTerm2 window:
+
+```sh
+python3 scripts/terminal_auto_approve.py watch --app Terminal --mode all
+python3 scripts/terminal_auto_approve.py watch --app iTerm2 --mode all
+```
+
 ## Operating Rules
 
 - Default to `safe` unless the user explicitly asks for approval of everything.
@@ -84,7 +98,9 @@ python3 scripts/auto_agree_bootstrap.py status
   hard safety checks.
 - Do not use mouse or keyboard automation for Claude permission dialogs. Use the
   hook/config path.
+- For terminal prompts, prefer `terminal_auto_approve.py run` when starting a new
+  command. Use `watch` only when the prompt is already open in Terminal/iTerm2.
+- Never auto-enter passwords, API keys, OTP/2FA codes, or similar secrets.
 - Do not paste secrets into chat. The hook log redacts obvious token-like values.
 - Existing Claude Code or Codex sessions may need a new session or app restart
   before config changes are picked up.
-

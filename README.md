@@ -5,12 +5,14 @@ Portable local auto-approval helper for Claude Code and Codex.
 It includes:
 
 - a dependency-free Python bootstrap script
+- a dependency-free terminal confirmation helper
 - a reusable Codex/Claude skill folder
 - safe, all, and off modes
 - backup-before-edit behavior for user settings
 
 This is not GUI click automation. It uses Claude Code hooks and Codex config
-files.
+files. The optional terminal helper only targets terminal prompts and sends
+keyboard input to Terminal/iTerm2 when explicitly run.
 
 ## Quick Start
 
@@ -64,6 +66,29 @@ Safe Codex mode:
 python3 auto_agree_bootstrap.py codex-safe
 ```
 
+## Terminal Confirmation Prompts
+
+Run a command under a managed pseudo-terminal:
+
+```sh
+python3 terminal_auto_approve.py run --mode all -- npm install
+```
+
+Watch an already-open macOS terminal window:
+
+```sh
+python3 terminal_auto_approve.py watch --app Terminal --mode all
+python3 terminal_auto_approve.py watch --app iTerm2 --mode all
+```
+
+The helper recognizes common prompts such as `Continue? [y/N]`, `Press Enter to
+continue`, highlighted `Yes/Allow/Continue` rows, and numbered `1. Yes` menus.
+
+Hard safety rules still apply: it never enters passwords, passphrases, API keys,
+OTP/2FA codes, or similar secrets. In `safe` mode it also refuses prompts whose
+recent terminal context looks destructive, such as `sudo`, `rm -rf`, production
+deploys, migrations, destructive git operations, or cloud write commands.
+
 ## Reusable Skill
 
 Copy this folder into your Codex skills directory:
@@ -76,6 +101,12 @@ Then use the bundled script:
 
 ```sh
 python3 skills/auto-agree-permissions/scripts/auto_agree_bootstrap.py install --mode safe
+```
+
+The copied skill also includes:
+
+```sh
+python3 skills/auto-agree-permissions/scripts/terminal_auto_approve.py run --mode all -- your-command
 ```
 
 ## What It Changes
@@ -109,8 +140,8 @@ checks may still override it.
 - Python 3.9+
 - Claude Code for Claude hook usage
 - Codex for Codex config usage
+- macOS Accessibility permission for `terminal_auto_approve.py watch`
 
 ## License
 
 MIT
-
