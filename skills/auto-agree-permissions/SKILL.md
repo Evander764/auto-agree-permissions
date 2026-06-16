@@ -96,6 +96,9 @@ python3 scripts/terminal_auto_approve.py watch --app iTerm2 --mode all
 - Default to `safe` unless the user explicitly asks for approval of everything.
 - Explain that `all` is high power and can still be overridden by app policy or
   hard safety checks.
+- On Windows, use `python .\scripts\auto_agree_bootstrap.py ...` or the full
+  Python executable path. The bootstrap records the current Python executable
+  in the managed Claude hook command, so `python3` does not need to exist.
 - Do not use mouse or keyboard automation for Claude permission dialogs. Use the
   hook/config path.
 - For terminal prompts, prefer `terminal_auto_approve.py run` when starting a new

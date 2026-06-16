@@ -14,6 +14,7 @@ import os
 import re
 import shlex
 import shutil
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -36,6 +37,7 @@ import json
 import os
 import re
 import shlex
+import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -365,7 +367,10 @@ def ensure_config(mode: str) -> None:
 
 
 def managed_command() -> str:
-    return f"python3 {json.dumps(str(hook_path()))}"
+    parts = [sys.executable, str(hook_path())]
+    if os.name == "nt":
+        return subprocess.list2cmdline(parts)
+    return " ".join(shlex.quote(part) for part in parts)
 
 
 def is_managed_hook(hook: Any) -> bool:
