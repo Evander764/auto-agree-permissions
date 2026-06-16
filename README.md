@@ -14,7 +14,16 @@ This is not GUI click automation. It uses Claude Code hooks and Codex config
 files. The optional terminal helper only targets terminal prompts and sends
 keyboard input to Terminal/iTerm2 when explicitly run.
 
+## Safety Note
+
+This is a local user-level convenience tool. It does not break app policy,
+managed policy, sandboxing, tenant controls, or hard safety checks. Use `safe`
+mode by default. Use `all` only when you understand that routine approvals will
+be skipped for the supported surfaces.
+
 ## Quick Start
+
+macOS/Linux:
 
 Install the Claude Code hook in safe mode:
 
@@ -46,6 +55,16 @@ Show status:
 python3 auto_agree_bootstrap.py status
 ```
 
+Windows PowerShell:
+
+```powershell
+python .\auto_agree_bootstrap.py install --mode safe
+python .\auto_agree_bootstrap.py status
+```
+
+If `python` is not on PATH, run the script with the Python executable bundled
+with your local toolchain.
+
 ## Codex
 
 Enable Codex approve-everything mode:
@@ -64,6 +83,14 @@ Safe Codex mode:
 
 ```sh
 python3 auto_agree_bootstrap.py codex-safe
+```
+
+Windows PowerShell equivalents:
+
+```powershell
+python .\auto_agree_bootstrap.py codex-all
+python .\auto_agree_bootstrap.py codex-off
+python .\auto_agree_bootstrap.py codex-safe
 ```
 
 ## Terminal Confirmation Prompts
@@ -117,6 +144,8 @@ Claude Code:
 - writes config to `~/.claude-auto-agree/config.json`
 - appends audit logs to `~/.claude-auto-agree/log.jsonl`
 - merges hook entries into `~/.claude/settings.json`
+- stores the Python executable used during install in the hook command, so
+  Windows installs do not depend on a `python3` command existing on PATH
 
 Codex:
 
@@ -136,11 +165,26 @@ checks may still override it.
 
 ## Requirements
 
-- macOS or Linux
+- Windows, macOS, or Linux
 - Python 3.9+
 - Claude Code for Claude hook usage
 - Codex for Codex config usage
 - macOS Accessibility permission for `terminal_auto_approve.py watch`
+
+## Windows Smoke Test Without Touching Real Settings
+
+```powershell
+$tmp = Join-Path $env:TEMP ("autoagree-test-" + [guid]::NewGuid().ToString("N"))
+New-Item -ItemType Directory -Force $tmp | Out-Null
+$env:CLAUDE_AUTO_AGREE_HOME = Join-Path $tmp "home"
+$env:CLAUDE_SETTINGS_PATH = Join-Path $tmp "claude-settings.json"
+$env:CODEX_CONFIG_PATH = Join-Path $tmp "codex-config.toml"
+python .\auto_agree_bootstrap.py install --mode safe
+python .\auto_agree_bootstrap.py codex-all
+python .\auto_agree_bootstrap.py status
+python .\auto_agree_bootstrap.py codex-off
+python .\auto_agree_bootstrap.py uninstall
+```
 
 ## License
 
